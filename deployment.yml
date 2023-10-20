@@ -1,0 +1,85 @@
+#apiVersion: v1 # Kubernetes API version
+#kind: Service # Kubernetes resource kind we are creating
+#metadata: # Metadata of the resource kind we are creating
+#  name: demo2
+#spec:
+#  selector:
+#    app: demo2
+#  ports:
+#    - protocol: "TCP"
+#      port: 8081 # The port that the service is running on in the cluster
+#      targetPort: 8081 # The port exposed by the service
+#  type: LoadBalancer # type of the service. LoadBalancer indicates that our service will be external.
+#---
+#apiVersion: apps/v1
+#kind: Deployment # Kubernetes resource kind we are creating
+#metadata:
+#  name: demo2
+#spec:
+#  selector:
+#    matchLabels:
+#      app: demo2
+#  replicas: 2 # Number of replicas that will be created for this deployment
+#  template:
+#    metadata:
+#      labels:
+#        app: demo2
+#    spec:
+#      containers:
+#        - name: demo2
+#          image: demo2:latest # Image that will be used to containers in the cluster
+#          imagePullPolicy: IfNotPresent
+#          ports:
+#            - containerPort: 8083
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo2
+spec:
+  selector:
+    matchLabels:
+      app: demo2
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: demo2
+    spec:
+      containers:
+        - name: demo
+          image: afshalhassan/demo
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8083
+          env:   # Setting Enviornmental Variables
+            - name: DB_HOST   # Setting Database host address from configMap
+              value: mysql
+
+
+            - name: DB_NAME  # Setting Database name from configMap
+              value : contact
+
+
+            - name: DB_USERNAME  # Setting Database username from Secret
+              value : root
+
+
+            - name: DB_PASSWORD # Setting Database password from Secret
+              value : root
+
+
+---
+
+apiVersion: v1 # Kubernetes API version
+kind: Service # Kubernetes resource kind we are creating
+metadata: # Metadata of the resource kind we are creating
+  name: demo2
+spec:
+  selector:
+    app: demo2
+  ports:
+    - protocol: "TCP"
+      port: 8085 # The port that the service is running on in the cluster
+      targetPort: 8085 # The port exposed by the service
+  type: NodePort # type of the service
